@@ -1,3 +1,4 @@
+
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
@@ -21,3 +22,4 @@ Demo/
 新建文件夹/
 
 *.meta
+*.rar

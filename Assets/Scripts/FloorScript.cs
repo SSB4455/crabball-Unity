@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class FloorScript : MonoBehaviour {
@@ -16,14 +16,21 @@ public class FloorScript : MonoBehaviour {
 	
 	}
 	
-	void OnCollisionEnter(Collision collisionInfo)
+	void OnCollisionEnter2D (Collision2D col)
 	{
-		Debug.Log ("floor");
+		PlayerScript player = col.gameObject.GetComponent<PlayerScript>();
+		if (player != null)
+		{
+			//player.onFloor = true;
+		}
 	}
 	
-	void OnTriggerEnter (Collider other)
+	void OnCollisionExit2D (Collision2D col)
 	{
-		
-		Debug.Log ("floor OnTriggerEnter");
+		PlayerScript player = col.gameObject.GetComponent<PlayerScript>();
+		if (player != null)
+		{
+			//player.onFloor = false;
+		}
 	}
 }

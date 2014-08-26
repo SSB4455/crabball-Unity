@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class BallScript : MonoBehaviour {
@@ -15,13 +15,13 @@ public class BallScript : MonoBehaviour {
 	
 	void FixedUpdate ()
 	{
-		Debug.Log ("FixedUpdate v="+rigidbody2D.velocity);
+		//Debug.Log ("BallScript FixedUpdate v="+rigidbody2D.velocity);
 	}
 	
-	void OnCollisionEnter2D(Collision2D collisionInfo)
+	void OnCollisionEnter2D (Collision2D col)
 	{
 		Vector2 oldV = rigidbody2D.velocity;
-		Debug.Log ("OnCollisionEnter2D oldV="+oldV);
+		//Debug.Log ("BallScript OnCollisionEnter2D oldV=" + oldV);
 		//rigidbody2D.velocity = new Vector2 (oldV.x, -3 * oldV.y);
 		
 	}
