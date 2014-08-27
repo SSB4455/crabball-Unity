@@ -4,13 +4,12 @@ using System.Collections;
 public class PlayerScript : MonoBehaviour {
 
 	public bool onFloor = false;
-	public Vector2 speed = new Vector2 (10, 5);
+	public float moveV = 300;
+	public float upMoveV = 100;
 	public float jumpForce = 1000f;
-	private Vector2 movement;
+	bool jump;
 
 	private Animator anim;
-	bool jump;
-	
 	private Transform groundCheck;			// A position marking where to check if the player is grounded.
 
 
@@ -33,16 +32,17 @@ public class PlayerScript : MonoBehaviour {
 	{
 		bool grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
 		
-		
-		movement = new Vector2 (0, 0);
+		float inputX = Input.GetAxis ("Horizontal");
+		bool left = Input.GetKeyDown ("left");
+	
 		if (grounded)
 		{
-			float inputX = Input.GetAxis ("Horizontal");
 			jump = Input.GetKeyDown ("up");
-			
-			movement = new Vector2 (speed.x * inputX, rigidbody2D.velocity.y);
-			rigidbody2D.velocity = movement;
+
+			rigidbody2D.velocity = new Vector2 (moveV * (left? -1:1), rigidbody2D.velocity.y);
 			//Debug.Log ("PlayerScript rigidbody2D.velocity=" + rigidbody2D.velocity);
+		} else {
+			rigidbody2D.velocity = new Vector2 (upMoveV * (left? -1:1), rigidbody2D.velocity.y);
 		}
 
 	}
@@ -59,7 +59,7 @@ public class PlayerScript : MonoBehaviour {
 			//AudioSource.PlayClipAtPoint(jumpClips[i], transform.position);
 			
 			// Add a vertical force to the player.
-			rigidbody2D.AddForce(new Vector2(0f, jumpForce));
+			rigidbody2D.AddForce (new Vector2(0f, jumpForce));
 			
 			// Make sure the player can't jump again until the jump conditions from Update are satisfied.
 			jump = false;
