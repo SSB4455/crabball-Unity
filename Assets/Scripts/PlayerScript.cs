@@ -2,12 +2,14 @@ using UnityEngine;
 using System.Collections;
 
 public class PlayerScript : MonoBehaviour {
-
-	public bool onFloor = false;
-	public float moveV = 300;
-	public float upMoveV = 100;
+	
+	[HideInInspector]
+	public bool facingRight = false;		// For determining which way the player is currently facing.
+	public float moveForce = 365f;			// Amount of force added to move the player left and right.
+	public float maxSpeed = 5f;				// The fastest the player can travel in the x axis.
 	public float jumpForce = 1000f;
 	bool jump;
+	private bool grounded;
 
 	private Animator anim;
 	private Transform groundCheck;			// A position marking where to check if the player is grounded.
@@ -30,26 +32,50 @@ public class PlayerScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-		bool grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
-		
-		float inputX = Input.GetAxis ("Horizontal");
+		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+
 		bool left = Input.GetKeyDown ("left");
 	
 		if (grounded)
 		{
 			jump = Input.GetKeyDown ("up");
-
-			rigidbody2D.velocity = new Vector2 (moveV * (left? -1:1), rigidbody2D.velocity.y);
+			
 			//Debug.Log ("PlayerScript rigidbody2D.velocity=" + rigidbody2D.velocity);
-		} else {
-			rigidbody2D.velocity = new Vector2 (upMoveV * (left? -1:1), rigidbody2D.velocity.y);
 		}
-
 	}
 	
 	void FixedUpdate ()
 	{
-		if(jump)
+		float inputX = Input.GetAxis ("Horizontal");
+		
+		// The Speed animator parameter is set to the absolute value of the horizontal input.
+		//anim.SetFloat ("Speed", Mathf.Abs(inputX));
+		
+		// If the player is changing direction (h has a different sign to velocity.x) or hasn't reached maxSpeed yet...
+		if (inputX * rigidbody2D.velocity.x < maxSpeed)
+		{
+			// ... add a force to the player.
+			rigidbody2D.AddForce (Vector2.right * inputX * moveForce);
+		}
+		
+		// If the player's horizontal velocity is greater than the maxSpeed...
+		if (Mathf.Abs(rigidbody2D.velocity.x) > maxSpeed)
+		{
+			// ... set the player's velocity to the maxSpeed in the x axis.
+			rigidbody2D.velocity = new Vector2 (Mathf.Sign(rigidbody2D.velocity.x) * maxSpeed, rigidbody2D.velocity.y);
+		}
+		
+		// If the input is moving the player right and the player is facing left...
+		if (inputX > 0 && !facingRight)
+		{
+			// ... flip the player.
+			Flip ();
+		} else if (inputX < 0 && facingRight) {	// Otherwise if the input is moving the player left and the player is facing right...
+			// ... flip the player.
+			Flip ();
+		}
+
+		if (jump)
 		{
 			// Set the Jump animator trigger parameter.
 			//anim.SetTrigger("Jump");
@@ -64,6 +90,17 @@ public class PlayerScript : MonoBehaviour {
 			// Make sure the player can't jump again until the jump conditions from Update are satisfied.
 			jump = false;
 		}
+	}
+	
+	void Flip ()
+	{
+		// Switch the way the player is labelled as facing.
+		facingRight = !facingRight;
+		
+		// Multiply the player's x local scale by -1.
+		Vector3 theScale = transform.localScale;
+		theScale.x *= -1;
+		transform.localScale = theScale;
 	}
 
 	void OnCollisionEnter2D (Collision2D col)
